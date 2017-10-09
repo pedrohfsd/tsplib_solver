@@ -124,6 +124,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="tsp_common.h" />
+    <ClInclude Include="tsp_mip_mtz.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="tsp.cpp" />

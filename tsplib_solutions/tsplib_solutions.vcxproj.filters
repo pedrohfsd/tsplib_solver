@@ -18,6 +18,9 @@
     <ClInclude Include="tsp_common.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
+    <ClInclude Include="tsp_mip_mtz.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="tsp_mip_mtz.cpp">

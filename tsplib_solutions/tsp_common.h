@@ -10,21 +10,21 @@ ILOSTLBEGIN
 
 
 class Edge{
-	public:
-		int cost;
-		int id;
+public:
+	int cost;
+	int id;
 };
 
 class Vertice{
-	public:
-		Edge* edges;
-		int m;
+public:
+	Edge* edges;
+	int m;
 };
 
 class Data{
-	public:
-		Vertice* vertices;
-		int n;
+public:
+	Vertice* vertices;
+	int n;
 };
 
 Data* read(const string& filepath);

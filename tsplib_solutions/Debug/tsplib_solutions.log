@@ -1,3 +1,0 @@
-﻿  tsp.cpp
-e:\pedro\projects\tsplib_solutions\tsplib_solutions\tsplib_solutions\tsp_mip_mtz.cpp(31): warning C4715: 'TSP_MIP_MTZ::run': nem todos os caminhos de controle retornam um valor
-concert.lib(iloexpression.obj) : fatal error LNK1112: tipo de módulo de máquina 'x64' conflita com tipo de máquina alvo 'x86'
