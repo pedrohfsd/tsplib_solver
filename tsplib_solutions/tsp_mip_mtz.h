@@ -6,7 +6,7 @@
 class TSP_MIP_MTZ {
 
 public:
-	const string PROBLEM = "TSP_MIP_MTZ";
+	const std::string PROBLEM = "TSP_MIP_MTZ";
 	void run(Data&);
 
 private:

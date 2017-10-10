@@ -6,6 +6,8 @@ ui-uj+1 <= (n-1)(1-xij) , i!=1, j!=1
 
 #include "tsp_mip_mtz.h"
 
+using namespace std;
+
 void TSP_MIP_MTZ::run(Data& data) {
 	IloEnv   env;
 	IloModel model(env, PROBLEM.c_str());
@@ -20,6 +22,7 @@ void TSP_MIP_MTZ::run(Data& data) {
 	model.add(con);
 	IloCplex cplex(model);
 	cplex.exportModel((PROBLEM + ".lp").c_str());
+	cplex.setParam(IloCplex::Threads, 1);
 
 	if (!cplex.solve()) {
 		env.error() << "Failed to optimize LP" << endl;
@@ -34,7 +37,7 @@ void TSP_MIP_MTZ::addDecisionVariables(IloModel model, IloNumVarArray var, IloRa
 	for (int i = 0; i < data.n; i++) {
 		for (int j = 0; j < data.n; j++) {
 			stringstream name; name << "x_" << i << "_" << j;
-			var.add(IloNumVar(env, 0.0, 1.0, ILOINT, name.str().c_str()));
+			var.add(IloBoolVar(env, name.str().c_str()));
 		}
 	}
 }
@@ -71,16 +74,17 @@ void TSP_MIP_MTZ::addDegreeConstraints(IloModel model, IloNumVarArray var, IloRa
 
 void TSP_MIP_MTZ::addSubtourEliminationConstraint(IloModel model, IloNumVarArray var, IloRangeArray con, Data& data)	{
 	IloEnv env = model.getEnv();
-	IloNumVar* u = new IloNumVar[data.n];
+	IloNumVarArray u(env, data.n);
 	for (int v = 1; v < data.n; v++) {
-		stringstream name; name << "u_" << v;
-		var.add(u[v] = IloNumVar(env, 2.0, data.n, ILOINT, name.str().c_str()));
+		stringstream name;
+		name << "u_" << v;
+		var.add(u[v] = IloIntVar(env, 2, data.n, name.str().c_str()));
 	}
 	for (int i = 1; i < data.n; i++) {
 		for (int j = 1; j < data.n; j++) {
 			IloExpr expr(env);
 			expr += u[i]- u[j] + 1;
-			expr -= (data.n-1)*(1-var[data.vertices[i].edges[j].id]);
+			expr -= (data.n - 1) * (1 - var[data.vertices[i].edges[j].id]);
 			con.add(IloRange(expr <= 0));
 			expr.end();
 		}

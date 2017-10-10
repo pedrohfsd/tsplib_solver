@@ -1,6 +1,8 @@
 #include <fstream>
 #include "tsp_common.h"
 
+using namespace std;
+
 int attDistance(double*, double*);
 Data* buildDataFromNodes(double**, int, int(*f)(double*, double*));
 Data* buildDataFromEdges(double** nodes, int n);

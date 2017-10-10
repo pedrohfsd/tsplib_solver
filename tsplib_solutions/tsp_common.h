@@ -2,12 +2,10 @@
 #define TSP_COMMON_H_
 
 #include <ilcplex/ilocplex.h>
+
 #include <algorithm>
 #include <sstream>
-#include <algorithm>
 #include <unordered_map>
-ILOSTLBEGIN
-
 
 class Edge{
 public:
@@ -27,6 +25,6 @@ public:
 	int n;
 };
 
-Data* read(const string& filepath);
+Data* read(const std::string& filepath);
 
 #endif  // TSP_COMMON_H_
