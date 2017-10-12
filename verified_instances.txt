@@ -1,0 +1,7 @@
+The following instances have optimal solution matching published results on http://comopt.ifi.uni-heidelberg.de/software/TSPLIB95/STSP.html:
+
+burma14.tsp
+eil51.tsp
+gr17.tsp
+ulysses16.tsp
+ulysses22.tsp

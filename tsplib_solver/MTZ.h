@@ -1,13 +1,14 @@
-#ifndef TSP_MIP_MTZ_H_
-#define TSP_MIP_MTZ_H_
+#ifndef MTZ_H_
+#define MTZ_H_
 
-#include "tsp_common.h"
+class Data;
 
-class TSP_MIP_MTZ {
+class MTZ {
 
 public:
-	const std::string PROBLEM = "TSP_MIP_MTZ";
+	const std::string PROBLEM = "MTZ";
 	void run(Data&);
+	MTZ();
 
 private:
 	void addDecisionVariables(IloModel, IloNumVarArray, IloRangeArray, Data&);
@@ -18,4 +19,4 @@ private:
 
 };
 
-#endif // TSP_MIP_MTZ_H_
+#endif // MTZ_H_
