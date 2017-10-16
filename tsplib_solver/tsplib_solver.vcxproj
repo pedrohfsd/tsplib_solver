@@ -83,6 +83,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="CuttingPlane_LP.h" />
+    <ClInclude Include="CuttingPlane_MIP.h" />
     <ClInclude Include="Data.h" />
     <ClInclude Include="Edge.h" />
     <ClInclude Include="FileParser.h" />
@@ -90,6 +92,8 @@
     <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CuttingPlane_LP.cpp" />
+    <ClCompile Include="CuttingPlane_MIP.cpp" />
     <ClCompile Include="Data.cpp" />
     <ClCompile Include="Edge.cpp" />
     <ClCompile Include="main.cpp" />

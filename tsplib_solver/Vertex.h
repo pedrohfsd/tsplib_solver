@@ -7,8 +7,8 @@ class Vertex {
 public:
 	std::vector<Edge> edges;
 	Vertex();
-	Vertex(int);
-	void init(int);
+	Vertex(int m);
+	void init(int m);
 };
 
 #endif  // Vertex_H_

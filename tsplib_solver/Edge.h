@@ -6,9 +6,9 @@ public:
 	int id;
 	int cost;
 	Edge();
-	Edge(int, int);
+	Edge(int id, int cost);
 private:
-	void init(int, int);
+	void init(int id, int cost);
 };
 
 #endif  // Edge_H_

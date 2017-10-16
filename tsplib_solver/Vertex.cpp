@@ -15,7 +15,8 @@ Vertex::Vertex(int m) {
 };
 
 void Vertex::init(int m) {
+	edges.clear();
 	if (m > 0) {
-		edges = vector<Edge>(m);
+		for (int i = 0; i < m; i++) edges.push_back(Edge());
 	}
 };

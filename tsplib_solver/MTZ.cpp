@@ -20,7 +20,7 @@ If we can number all the nodes from 1 to n in the above way, then this must be a
 using namespace std;
 
 MTZ::MTZ() {
-}
+};
 
 void MTZ::run(Data& data) {
 	IloEnv   env;
@@ -44,36 +44,22 @@ void MTZ::run(Data& data) {
 	}
 
 	print(cplex, vars, cons);
-}
+};
 
 void MTZ::addDecisionVariables(IloModel model, IloNumVarArray var, IloRangeArray con, Data& data) {
 	IloEnv env = model.getEnv();
-	int n = data.vertices.size();
+	size_t n = data.vertices.size();
 	for (int i = 0; i < n; i++) {
 		for (int j = 0; j < n; j++) {
 			stringstream name; name << "x_" << i << "_" << j;
 			var.add(IloBoolVar(env, name.str().c_str()));
 		}
 	}
-}
-
-void MTZ::addObjectiveFunction(IloModel model, IloNumVarArray var, IloRangeArray con, Data& data) {
-	IloEnv env = model.getEnv();
-	IloExpr expr(env);
-	int n = data.vertices.size();
-	for (int i = 0; i < n; i++) {
-		for (int j = 0; j < n; j++) {
-			Edge edge = data.vertices[i].edges[j];
-			expr += edge.cost * var[edge.id];
-		}
-	}
-	model.add(IloMinimize(env, expr));
-	expr.end();
-}
+};
 
 void MTZ::addDegreeConstraints(IloModel model, IloNumVarArray var, IloRangeArray con, Data& data) {
 	IloEnv env = model.getEnv();
-	int n = data.vertices.size();
+	size_t n = data.vertices.size();
 	for (int i = 0; i < n; i++) {
 		IloExpr expr(env);
 		for (int j = 0; j < n; j++) 
@@ -87,11 +73,25 @@ void MTZ::addDegreeConstraints(IloModel model, IloNumVarArray var, IloRangeArray
 		con.add(IloRange(expr == 1));
 		expr.end();
 	}
-}
+};
+
+void MTZ::addObjectiveFunction(IloModel model, IloNumVarArray var, IloRangeArray con, Data& data) {
+	IloEnv env = model.getEnv();
+	IloExpr expr(env);
+	size_t n = data.vertices.size();
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < n; j++) {
+			Edge edge = data.vertices[i].edges[j];
+			expr += edge.cost * var[edge.id];
+		}
+	}
+	model.add(IloMinimize(env, expr));
+	expr.end();
+};
 
 void MTZ::addSubtourEliminationConstraint(IloModel model, IloNumVarArray var, IloRangeArray con, Data& data)	{
 	IloEnv env = model.getEnv();
-	int n = data.vertices.size();
+	int n = (int)data.vertices.size();
 	IloNumVarArray u(env, n);
 	for (int v = 1; v < n; v++) {
 		stringstream name;
@@ -107,7 +107,7 @@ void MTZ::addSubtourEliminationConstraint(IloModel model, IloNumVarArray var, Il
 			expr.end();
 		}
 	}
-}
+};
 
 void MTZ::print(IloCplex cplex, IloNumVarArray var, IloRangeArray con) {
 	IloEnv env = cplex.getEnv();
@@ -122,4 +122,4 @@ void MTZ::print(IloCplex cplex, IloNumVarArray var, IloRangeArray con) {
 	env.out() << "Duals         = " << vals << endl;
 	cplex.getReducedCosts(vals, var);
 	env.out() << "Reduced Costs = " << vals << endl;*/
-}
+};
