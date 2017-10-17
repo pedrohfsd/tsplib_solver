@@ -1,15 +1,15 @@
-#ifndef CuttingPlane_MIP_H_
-#define CuttingPlane_MIP_H_
+#ifndef CuttingPlane_MIP_CALLBACK_H_
+#define CuttingPlane_MIP_CALLBACK_H_
 
 #include <ilcplex/ilocplex.h>
 
 class Data;
 
-class CuttingPlane_MIP {
+class CuttingPlane_MIP_Callback {
 
 public:
-	const std::string PROBLEM = "CuttingPlane_MIP";
-	CuttingPlane_MIP();
+	const std::string PROBLEM = "CuttingPlane_MIP_Callback";
+	CuttingPlane_MIP_Callback();
 	void run(Data&, bool option1);
 
 private:
@@ -22,4 +22,17 @@ private:
 
 };
 
-#endif // CuttingPlane_MIP_H_
+class MyCallback : public IloCplex::LazyConstraintCallbackI
+{
+public:
+	MyCallback(IloEnv env, IloNumVarArray x, Data& data);
+
+	void main();
+
+	IloCplex::CallbackI* duplicateCallback() const;
+private:
+	Data& data;
+	IloNumVarArray x;
+};
+
+#endif

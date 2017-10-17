@@ -1,4 +1,4 @@
-#include "CuttingPlane_MIP.h"
+#include "CuttingPlane_MIP_Callback.h"
 
 #include <vector>
 #include <stack>
@@ -10,10 +10,10 @@
 
 using namespace std;
 
-CuttingPlane_MIP::CuttingPlane_MIP() {
+CuttingPlane_MIP_Callback::CuttingPlane_MIP_Callback() {
 };
 
-void CuttingPlane_MIP::run(Data& data, bool option1) {
+void CuttingPlane_MIP_Callback::run(Data& data, bool option1) {
 	IloEnv   env;
 	IloModel model(env, PROBLEM.c_str());
 	IloNumVarArray vars(env);
@@ -25,24 +25,18 @@ void CuttingPlane_MIP::run(Data& data, bool option1) {
 
 	IloCplex cplex(model);
 	cplex.setParam(IloCplex::Threads, 1);
-	cplex.setOut(env.getNullStream());
+	//cplex.setOut(env.getNullStream());
 	cplex.setWarning(env.getNullStream());
-	long current = 0;
-	long limit = 100000;
-	while (current++ < limit) {
-		cplex.exportModel((PROBLEM + ".lp").c_str());
-		if (!cplex.solve())	break;
-		cout << "Obj = " << cplex.getObjValue() << endl;
-		if (option1 && !addSubtourConnectionConstraint(cplex, vars, data)) break;
-		if (!option1 && !addSubtourEliminationConstraint(cplex, vars, data)) break;
-		cout << current << " cut(s) added in total" << endl;
-	}
-	if(current == limit) throw("Number of constraints exceeded 2^n");
+
+	cplex.exportModel((PROBLEM + ".lp").c_str());
+	cplex.use(new MyCallback(env, vars, data));
+	if (!cplex.solve())	return;
+	cout << "Obj = " << cplex.getObjValue() << endl;
 
 	print(cplex, vars);
 };
 
-void CuttingPlane_MIP::addDegreeConstraints(IloModel model, IloNumVarArray vars, Data& data) {
+void CuttingPlane_MIP_Callback::addDegreeConstraints(IloModel model, IloNumVarArray vars, Data& data) {
 	IloEnv env = model.getEnv();
 	IloRangeArray cons(env);
 
@@ -63,7 +57,7 @@ void CuttingPlane_MIP::addDegreeConstraints(IloModel model, IloNumVarArray vars,
 	model.add(cons);
 };
 
-void CuttingPlane_MIP::addDecisionVariables(IloModel model, IloNumVarArray vars, Data& data) {
+void CuttingPlane_MIP_Callback::addDecisionVariables(IloModel model, IloNumVarArray vars, Data& data) {
 	IloEnv env = model.getEnv();
 	int n = data.vertices.size();
 	for (int i = 0; i < n; i++) {
@@ -75,7 +69,7 @@ void CuttingPlane_MIP::addDecisionVariables(IloModel model, IloNumVarArray vars,
 	}
 };
 
-void CuttingPlane_MIP::addObjectiveFunction(IloModel model, IloNumVarArray vars, Data& data) {
+void CuttingPlane_MIP_Callback::addObjectiveFunction(IloModel model, IloNumVarArray vars, Data& data) {
 	IloEnv env = model.getEnv();
 	IloExpr expr(env);
 	int n = data.vertices.size();
@@ -89,7 +83,7 @@ void CuttingPlane_MIP::addObjectiveFunction(IloModel model, IloNumVarArray vars,
 	expr.end();
 };
 
-bool CuttingPlane_MIP::addSubtourConnectionConstraint(IloCplex cplex, IloNumVarArray vars, Data& data) {
+bool CuttingPlane_MIP_Callback::addSubtourConnectionConstraint(IloCplex cplex, IloNumVarArray vars, Data& data) {
 	IloModel model = cplex.getModel();
 	IloRangeArray cons(cplex.getEnv());
 	IloExpr expr(cplex.getEnv());
@@ -120,7 +114,7 @@ bool CuttingPlane_MIP::addSubtourConnectionConstraint(IloCplex cplex, IloNumVarA
 	return true;
 };
 
-bool CuttingPlane_MIP::addSubtourEliminationConstraint(IloCplex cplex, IloNumVarArray vars, Data& data) {
+bool CuttingPlane_MIP_Callback::addSubtourEliminationConstraint(IloCplex cplex, IloNumVarArray vars, Data& data) {
 	IloModel model = cplex.getModel();
 	IloRangeArray cons(cplex.getEnv());
 	IloExpr expr(cplex.getEnv());
@@ -148,7 +142,7 @@ bool CuttingPlane_MIP::addSubtourEliminationConstraint(IloCplex cplex, IloNumVar
 	return true;
 };
 
-void CuttingPlane_MIP::print(IloCplex cplex, IloNumVarArray vars) {
+void CuttingPlane_MIP_Callback::print(IloCplex cplex, IloNumVarArray vars) {
 	IloEnv env = cplex.getEnv();
 	IloNumArray vals(env);
 	env.out() << "Solution status = " << cplex.getStatus() << endl;
@@ -162,3 +156,37 @@ void CuttingPlane_MIP::print(IloCplex cplex, IloNumVarArray vars) {
 	cplex.getReducedCosts(vals, var);
 	env.out() << "Reduced Costs = " << vals << endl;*/
 };
+
+MyCallback::MyCallback(IloEnv env, IloNumVarArray x, Data& data) : IloCplex::LazyConstraintCallbackI(env), x(x), data(data) {}
+
+void MyCallback::main()
+{
+	IloRangeArray cons(getEnv());
+	IloExpr expr(getEnv());
+	int n = data.vertices.size();
+
+	vector<double> edges;
+	vector<vector<double>> valueMatrix;
+	for (int i = 0; i < x.getSize(); i++) edges.push_back(getValue(x[i]));
+	for (int i = 0; i < x.getSize(); i++) valueMatrix.push_back(vector<double>(n));
+	Data::toMatrix(edges, n, valueMatrix);
+
+	vector<int> s;
+	data.findConnectedComponent(valueMatrix, s);
+	if (s.size() == data.vertices.size()) return;
+
+	for (int i = 0; i < s.size(); i++) {
+		for (int j = i; j < s.size(); j++) {
+			expr += x[data.vertices[s[i]].edges[s[j]].id];
+			expr += x[data.vertices[s[j]].edges[s[i]].id];
+		}
+	}
+
+	add(IloRange(expr <= (int)s.size() - 1));
+	expr.end();
+}
+
+IloCplex::CallbackI* MyCallback::duplicateCallback() const
+{
+	return (new (getEnv()) MyCallback(*this));
+}

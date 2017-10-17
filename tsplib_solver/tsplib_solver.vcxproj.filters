@@ -54,6 +54,9 @@
     <ClInclude Include="CuttingPlane_LP.h">
       <Filter>Header Files\formulation</Filter>
     </ClInclude>
+    <ClInclude Include="CuttingPlane_MIP_Callback.h">
+      <Filter>Header Files\formulation</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Data.cpp">
@@ -78,6 +81,9 @@
       <Filter>Source Files\formulation</Filter>
     </ClCompile>
     <ClCompile Include="CuttingPlane_LP.cpp">
+      <Filter>Source Files\formulation</Filter>
+    </ClCompile>
+    <ClCompile Include="CuttingPlane_MIP_Callback.cpp">
       <Filter>Source Files\formulation</Filter>
     </ClCompile>
   </ItemGroup>

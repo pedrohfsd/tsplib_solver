@@ -8,6 +8,8 @@
 #include "CuttingPlane_LP.h"
 #include "Vertex.h"
 
+#define EPS 1e-5
+
 using namespace std;
 
 CuttingPlane_LP::CuttingPlane_LP() {
@@ -23,20 +25,21 @@ void CuttingPlane_LP::run(Data& data) {
 	addObjectiveFunction(model, vars, data);
 	addDegreeConstraints(model, vars, data);
 
-	IloCplex cplex(env);
+	IloCplex cplex(model);
 	cplex.setParam(IloCplex::Threads, 1);
 	cplex.setOut(env.getNullStream());
+	cplex.setWarning(env.getNullStream());
 	long current = 0;
-	double limit = pow(2, n);
+	double limit = 100000;
 	while (current++ < limit) {
-		cplex.extract(model);
+		cplex.exportModel((PROBLEM + ".lp").c_str());
 		if (!cplex.solve())	break;
+		cout << "Obj = " << cplex.getObjValue() << endl;
 		if (!addSubtourConnectionConstraint(cplex, vars, data)) break;
 		//if (!addSubtourEliminationConstraint(cplex, vars, data)) break;
 		cout << current << " cut(s) added in total" << endl;
 	}
 	if (current == limit) throw("Number of constraints exceeded 2^n");
-	cplex.exportModel((PROBLEM + ".lp").c_str());
 
 	print(cplex, vars);
 };
@@ -47,7 +50,8 @@ void CuttingPlane_LP::addDecisionVariables(IloModel model, IloNumVarArray vars, 
 	for (size_t i = 0; i < n; i++) {
 		for (size_t j = 0; j < n; j++) {
 			stringstream name; name << "x_" << i << "_" << j;
-			vars.add(IloFloatVar(env, 0.0, 1.0, name.str().c_str()));
+			vars.add(IloNumVar(env, 0.0, 1.0, name.str().c_str()));
+			if (i == j) vars[vars.getSize() - 1].setBounds(0, 0);
 		}
 	}
 };
@@ -95,17 +99,13 @@ bool CuttingPlane_LP::addSubtourConnectionConstraint(IloCplex cplex, IloNumVarAr
 	for (int i = 0; i < vars.getSize(); i++) costMatrix.push_back(vector<double>(n));
 	Data::toMatrix(edges, n, costMatrix);
 
-	for (size_t i = 0; i < n; i++) {
-		for (size_t j = 0; j < n; j++) {
-			if (i == j) continue;
-			vector<int> s;
-			vector<int> t;
-			int maxFlow = data.findMinCut(i, j, costMatrix, s);
-			if (s.size() == n) return false;
-			if (maxFlow == 1) continue;
-			addSubtourConstraints(cplex, vars, s, t, data);
-			return true;
-		}
+	for (size_t j = 1; j < n; j++) {
+		vector<int> s;
+		vector<int> t;
+		double maxFlow = data.findMinCut(0, j, costMatrix, s);
+		if (maxFlow - 1 > -EPS) continue;
+		addSubtourConstraints(cplex, vars, s, t, data);
+		return true;
 	}
 	return false;
 };
