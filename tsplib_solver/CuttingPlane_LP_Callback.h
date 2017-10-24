@@ -9,7 +9,7 @@
 class CuttingPlane_LP_Callback {
 
 public:
-	const std::string PROBLEM = "CuttingPlane_LP";
+	const std::string PROBLEM = "CuttingPlane_LP_Callback";
 	CuttingPlane_LP_Callback();
 	void run(Data&);
 
@@ -20,7 +20,6 @@ private:
 	bool addSubtourConnectionConstraint(IloCplex cplex, IloNumVarArray var, Data& data);
 	void addSubtourConstraints(IloCplex cplex, IloNumVarArray vars, const std::vector<int>& s, const std::vector<int>& t, Data& data);
 	void print(IloCplex, IloNumVarArray);
-
 };
 
 class MyCallback_LP : public IloCplex::LazyConstraintCallbackI

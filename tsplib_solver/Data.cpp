@@ -3,6 +3,8 @@
 #include <queue>
 #include <stack>
 
+#define EPS 1e-5
+
 using namespace std;
 
 Data::Data() {
@@ -29,7 +31,7 @@ void Data::findConnectedComponent(int root, const vector<vector<double>>& edgeVa
 	int n = (int)vertices.size();
 
 	queue<int> q;
-	vector<bool> visited(n);
+	vector<bool> visited(n, false);
 	q.push(root);
 	visited[root] = true;
 	while (!q.empty()) {
@@ -37,10 +39,9 @@ void Data::findConnectedComponent(int root, const vector<vector<double>>& edgeVa
 		q.pop();
 		connectComponent.push_back(node);
 		for (int i = 0; i < n; i++) {
-			if (!visited[i] && edgeValues[node][i] != 0) {
+			if (!visited[i] && fabs(edgeValues[node][i]) > EPS) {
 				q.push(i);
 				visited[i] = true;
-				break;
 			}
 		}
 	}
@@ -95,7 +96,7 @@ void Data::findAugmentingPath(int source, int sink, vector<int>& augmentingPath,
 		if (node == sink) break;
 		for (int i = 0; i < n; i++) {
 			if (visited[i]) continue;
-			if (flow[node][i] == capacities[node][i] && residual[i][node] == 0) continue;
+			if ((fabs(flow[node][i] - capacities[node][i]) < EPS) && (fabs(residual[i][node]) < EPS)) continue;
 			q.push(i);
 			prev[i] = node;
 			visited[i] = true;
@@ -117,11 +118,11 @@ double Data::augment(vector<int>& augmentingPath, const vector<vector<double>>&c
 	if (augmentingPath.size() < 2) throw(exception("Can't augment path from node to itself"));
 	int from = augmentingPath[0];
 	int to = augmentingPath[1];
-	double min = flow[from][to] < capacities[from][to] ? capacities[from][to] - flow[from][to] : residual[to][from];
+	double min = (flow[from][to] - capacities[from][to] < -EPS ? capacities[from][to] - flow[from][to] : residual[to][from]);
 	for (int i = 2; i < augmentingPath.size(); i++) {
 		from = augmentingPath[i-1];
 		to = augmentingPath[i];
-		double f = flow[from][to] < capacities[from][to] ? capacities[from][to] - flow[from][to] : residual[to][from];
+		double f = (flow[from][to] - capacities[from][to] < -EPS ? capacities[from][to] - flow[from][to] : residual[to][from]);
 		if (f < min) min = f;
 	}
 
@@ -129,7 +130,7 @@ double Data::augment(vector<int>& augmentingPath, const vector<vector<double>>&c
 		int from = augmentingPath[i-1];
 		int to = augmentingPath[i];
 		int edgeid = Data::indexToId(n, augmentingPath[i - 1], augmentingPath[i]);
-		if (flow[from][to] < capacities[from][to]) {
+		if (flow[from][to] - capacities[from][to] < -EPS) {
 			flow[from][to] += min;
 			residual[from][to] += min;
 		} else {

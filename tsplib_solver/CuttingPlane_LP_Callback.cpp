@@ -21,13 +21,24 @@ void CuttingPlane_LP_Callback::run(Data& data) {
 
 	IloCplex cplex(model);
 	cplex.setParam(IloCplex::Threads, 1);
-	//cplex.setOut(env.getNullStream());
-	//cplex.setWarning(env.getNullStream());
+	cplex.setOut(env.getNullStream());
+	cplex.setWarning(env.getNullStream());
 
-	cplex.exportModel((PROBLEM + ".lp").c_str());
+	while (true)
+	{
+#ifdef _DEBUG
+		cplex.exportModel((PROBLEM + ".lp").c_str());
+#endif
+		if (!cplex.solve())	return;
+		cout << "Obj = " << cplex.getObjValue() << endl;
+		if (!addSubtourConnectionConstraint(cplex, vars, data)) break;
+	}
+
+	model.add(IloConversion(env, vars, IloNumVar::Bool));
 	cplex.use(new MyCallback_LP(env, vars, data));
-	if (!cplex.solve())	return;
-	cout << "Obj = " << cplex.getObjValue() << endl;
+	cplex.setOut(cout);
+	cplex.setWarning(cout);
+	if (!cplex.solve()) return;
 
 	print(cplex, vars);
 }
@@ -37,7 +48,7 @@ void CuttingPlane_LP_Callback::addDecisionVariables(IloModel model, IloNumVarArr
 	size_t n = data.vertices.size();
 	for (size_t i = 0; i < n; i++) {
 		for (size_t j = 0; j < n; j++) {
-			vars.add(IloBoolVar(env, 0, 1, ("x_" + to_string(i) + "_" + to_string(j)).c_str()));
+			vars.add(IloNumVar(env, 0, 1, ("x_" + to_string(i) + "_" + to_string(j)).c_str()));
 			if (i == j) vars[vars.getSize() - 1].setBounds(0, 0);
 		}
 	}
@@ -80,17 +91,17 @@ void CuttingPlane_LP_Callback::addObjectiveFunction(IloModel model, IloNumVarArr
 
 bool CuttingPlane_LP_Callback::addSubtourConnectionConstraint(IloCplex cplex, IloNumVarArray vars, Data& data) {
 	size_t n = data.vertices.size();
-	vector<double> edges;
-	vector<vector<double>> costMatrix;
-	for (int i = 0; i < vars.getSize(); i++) edges.push_back(cplex.getValue(vars[i]));
-	for (int i = 0; i < vars.getSize(); i++) costMatrix.push_back(vector<double>(n));
+	vector<double> edges(vars.getSize());
+	vector<vector<double>> costMatrix(vars.getSize());
+	for (int i = 0; i < vars.getSize(); i++) edges[i] = cplex.getValue(vars[i]);
+	for (int i = 0; i < vars.getSize(); i++) costMatrix[i].resize(n);
 	Data::toMatrix(edges, n, costMatrix);
 
 	for (size_t j = 1; j < n; j++) {
 		vector<int> s;
 		vector<int> t;
 		double maxFlow = data.findMinCut(0, j, costMatrix, s);
-		if (maxFlow - 1 > -EPS) continue; // if maxFLow == 1
+		if (maxFlow - 1 > -EPS) continue; // if maxFLow >= 1
 		addSubtourConstraints(cplex, vars, s, t, data);
 		return true;
 	}
@@ -153,7 +164,6 @@ void MyCallback_LP::main()
 }
 
 void MyCallback_LP::addSubtourConstraints(IloNumVarArray x, const vector<int>& s, const vector<int>& t, Data& data) {
-	IloModel model = getModel();
 	IloRangeArray cons(getEnv());
 	int n = data.vertices.size();
 
@@ -164,9 +174,8 @@ void MyCallback_LP::addSubtourConstraints(IloNumVarArray x, const vector<int>& s
 			expr += x[data.vertices[s[j]].edges[s[i]].id];
 		}
 	}
-	cons.add(IloRange(expr <= (int)s.size() - 1));
+	add(IloRange(expr <= (int)s.size() - 1));
 	expr.end();
-	model.add(cons);
 }
 
 IloCplex::CallbackI* MyCallback_LP::duplicateCallback() const
