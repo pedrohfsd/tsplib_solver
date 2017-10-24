@@ -1,9 +1,9 @@
-#ifndef CuttingPlane_MIP_CALLBACK_H_
-#define CuttingPlane_MIP_CALLBACK_H_
+#ifndef CUTTINGPLANE_MIP_CALLBACK_H_
+#define CUTTINGPLANE_MIP_CALLBACK_H_
 
 #include <ilcplex/ilocplex.h>
 
-class Data;
+#include "Data.h"
 
 class CuttingPlane_MIP_Callback {
 
@@ -35,4 +35,4 @@ private:
 	IloNumVarArray x;
 };
 
-#endif
+#endif // CUTTINGPLANE_MIP_CALLBACK_H_

@@ -9,13 +9,10 @@ This formulation removes subtours by numbering each node and imposing a sequenti
 - for every node u, number[u] is distinct
 If we can number all the nodes from 1 to n in the above way, then this must be a feasible tour.
 */
-#include <ilcplex/ilocplex.h>
-#include <vector>
 
-#include "Data.h"
-#include "Edge.h"
 #include "MTZ.h"
-#include "Vertex.h"
+
+#include <vector>
 
 using namespace std;
 

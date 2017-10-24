@@ -1,7 +1,7 @@
-#ifndef Vertex_H_
-#define Vertex_H_
+#ifndef VERTEX_H_
+#define VERTEX_H_
 
-class Edge;
+#include "Edge.h"
 
 class Vertex {
 public:
@@ -11,4 +11,4 @@ public:
 	void init(int m);
 };
 
-#endif  // Vertex_H_
+#endif  // VERTEX_H_

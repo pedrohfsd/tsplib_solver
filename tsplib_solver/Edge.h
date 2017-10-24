@@ -1,5 +1,5 @@
-#ifndef Edge_H_
-#define Edge_H_
+#ifndef EDGE_H_
+#define EDGE_H_
 
 class Edge {
 public:
@@ -11,4 +11,4 @@ private:
 	void init(int id, int cost);
 };
 
-#endif  // Edge_H_
+#endif  // EDGE_H_

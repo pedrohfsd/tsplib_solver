@@ -4,10 +4,6 @@
 #include <stack>
 #include <cmath>
 
-#include "Data.h"
-#include "Edge.h"
-#include "Vertex.h"
-
 using namespace std;
 
 CuttingPlane_MIP::CuttingPlane_MIP() {
@@ -35,7 +31,7 @@ void CuttingPlane_MIP::run(Data& data, bool option1) {
 		cout << "Obj = " << cplex.getObjValue() << endl;
 		if (option1 && !addSubtourConnectionConstraint(cplex, vars, data)) break;
 		if (!option1 && !addSubtourEliminationConstraint(cplex, vars, data)) break;
-		cout << current << " cut(s) added in total" << endl;
+		cout << current << "cut(s) added in total" << endl;
 	}
 	if(current == limit) throw("Number of constraints exceeded 2^n");
 
@@ -68,8 +64,7 @@ void CuttingPlane_MIP::addDecisionVariables(IloModel model, IloNumVarArray vars,
 	int n = data.vertices.size();
 	for (int i = 0; i < n; i++) {
 		for (int j = 0; j < n; j++) {
-			stringstream name; name << "x_" << i << "_" << j;
-			vars.add(IloBoolVar(env, name.str().c_str()));
+			vars.add(IloBoolVar(env, ("x_" + to_string(i) + "_" + to_string(j)).c_str()));
 			if (i == j) vars[vars.getSize() - 1].setBounds(0, 0);
 		}
 	}

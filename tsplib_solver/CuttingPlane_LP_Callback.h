@@ -1,16 +1,16 @@
-#ifndef CUTTINGPLANE_LP_H_
-#define CUTTINGPLANE_LP_H_
+#ifndef CUTTINGPLANE_LP_CALLBACK_H
+#define CUTTINGPLANE_LP_CALLBACK_H
 
 #include <ilcplex/ilocplex.h>
 #include <vector>
 
 #include "Data.h"
 
-class CuttingPlane_LP {
+class CuttingPlane_LP_Callback {
 
 public:
 	const std::string PROBLEM = "CuttingPlane_LP";
-	CuttingPlane_LP();
+	CuttingPlane_LP_Callback();
 	void run(Data&);
 
 private:
@@ -23,4 +23,17 @@ private:
 
 };
 
-#endif // CUTTINGPLANE_LP_H_
+class MyCallback_LP : public IloCplex::LazyConstraintCallbackI
+{
+public:
+	MyCallback_LP(IloEnv env, IloNumVarArray x, Data& data);
+
+	void main();
+	void addSubtourConstraints(IloNumVarArray x, const std::vector<int>& s, const std::vector<int>& t, Data& data);
+	IloCplex::CallbackI* duplicateCallback() const;
+private:
+	Data& data;
+	IloNumVarArray x;
+};
+
+#endif // CUTTINGPLANE_LP_CALLBACK_H

@@ -1,17 +1,12 @@
-#include <functional>
 #include <iostream>
-#include <ilcplex/ilocplex.h>
-#include <unordered_map>
-#include <vector>
 
 #include "CuttingPlane_MIP.h"
 #include "CuttingPlane_MIP_Callback.h"
 #include "CuttingPlane_LP.h"
+#include "CuttingPlane_LP_Callback.h"
 #include "Data.h"
-#include "Edge.h"
 #include "FileParser.h"
 #include "MTZ.h"
-#include "Vertex.h"
 
 using namespace std;
 
@@ -35,9 +30,10 @@ int main(int argc, const char* argv[]) {
 
 		if(!strcmp(param1, "MTZ")) MTZ().run(data);
 		else if (!strcmp(param1, "CuttingPlane_MIP_1")) CuttingPlane_MIP().run(data, true);
-		else if (!strcmp(param1, "CuttingPlane_MIP_Callback")) CuttingPlane_MIP_Callback().run(data, true);
 		else if (!strcmp(param1, "CuttingPlane_MIP_2")) CuttingPlane_MIP().run(data, false);
+		else if (!strcmp(param1, "CuttingPlane_MIP_Callback")) CuttingPlane_MIP_Callback().run(data, true);
 		else if (!strcmp(param1, "CuttingPlane_LP")) CuttingPlane_LP().run(data);
+		else if (!strcmp(param1, "CuttingPlane_LP_Callback")) CuttingPlane_LP_Callback().run(data);
 	//}
 	//catch (IloException& e) {
 	//	cerr << "Concert exception caught: " << e << endl;

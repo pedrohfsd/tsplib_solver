@@ -4,10 +4,6 @@
 #include <stack>
 #include <cmath>
 
-#include "Data.h"
-#include "Edge.h"
-#include "Vertex.h"
-
 using namespace std;
 
 CuttingPlane_MIP_Callback::CuttingPlane_MIP_Callback() {
@@ -26,7 +22,7 @@ void CuttingPlane_MIP_Callback::run(Data& data, bool option1) {
 	IloCplex cplex(model);
 	cplex.setParam(IloCplex::Threads, 1);
 	//cplex.setOut(env.getNullStream());
-	cplex.setWarning(env.getNullStream());
+	//cplex.setWarning(env.getNullStream());
 
 	cplex.exportModel((PROBLEM + ".lp").c_str());
 	cplex.use(new MyCallback(env, vars, data));

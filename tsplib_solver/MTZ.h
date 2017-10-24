@@ -1,7 +1,8 @@
 #ifndef MTZ_H_
 #define MTZ_H_
 
-class Data;
+#include <ilcplex/ilocplex.h>
+#include "Data.h"
 
 class MTZ {
 

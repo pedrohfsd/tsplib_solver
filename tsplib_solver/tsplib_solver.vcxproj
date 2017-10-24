@@ -14,14 +14,14 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{0F2F19B8-E625-4AFC-8FA6-7884FE84A1E2}</ProjectGuid>
     <RootNamespace>tsplib_solver</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -84,6 +84,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CuttingPlane_LP.h" />
+    <ClInclude Include="CuttingPlane_LP_Callback.h" />
     <ClInclude Include="CuttingPlane_MIP.h" />
     <ClInclude Include="CuttingPlane_MIP_Callback.h" />
     <ClInclude Include="Data.h" />
@@ -94,6 +95,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CuttingPlane_LP.cpp" />
+    <ClCompile Include="CuttingPlane_LP_Callback.cpp" />
     <ClCompile Include="CuttingPlane_MIP.cpp" />
     <ClCompile Include="CuttingPlane_MIP_Callback.cpp" />
     <ClCompile Include="Data.cpp" />

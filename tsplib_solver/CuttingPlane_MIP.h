@@ -1,9 +1,9 @@
-#ifndef CuttingPlane_MIP_H_
-#define CuttingPlane_MIP_H_
+#ifndef CUTTINGPLANE_MIP_H_
+#define CUTTINGPLANE_MIP_H_
 
 #include <ilcplex/ilocplex.h>
+#include "Data.h"
 
-class Data;
 
 class CuttingPlane_MIP {
 
@@ -22,4 +22,4 @@ private:
 
 };
 
-#endif // CuttingPlane_MIP_H_
+#endif // CUTTINGPLANE_MIP_H_

@@ -1,11 +1,7 @@
-#include <memory>
+#include "Data.h"
+
 #include <queue>
 #include <stack>
-#include <vector>
-
-#include "Data.h"
-#include "Vertex.h"
-#include "Edge.h"
 
 using namespace std;
 
@@ -67,7 +63,7 @@ double Data::findMinCut(int source, int sink, const vector<vector<double>>& capa
 			remainingFlow[i][j] = capacities[i][j] - flow[i][j];
 		}
 	}
-	findConnectedComponent(remainingFlow, minCut);
+	findConnectedComponent(source, remainingFlow, minCut);
 	return max_flow;
 };
 

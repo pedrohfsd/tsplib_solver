@@ -1,7 +1,9 @@
 #ifndef Data_H_
 #define Data_H_
 
-class Vertex;
+#include <vector>
+
+#include "Vertex.h"
 
 class Data {
 public:

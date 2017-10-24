@@ -1,7 +1,13 @@
-#ifndef FileParser_H_
-#define FileParser_H_
+#ifndef FILEPARSER_H_
+#define FILEPARSER_H_
 
-class Data;
+#include <fstream>
+#include <functional>
+#include <string>
+#include <unordered_map>
+#include <vector>
+
+#include "Data.h"
 
 class FileParser {
 public:
@@ -21,4 +27,4 @@ private:
 	void readSpecification(std::ifstream& infile, std::unordered_map<std::string, std::string>& spec);
 };
 
-#endif  // FileParser_H_
+#endif  // FILEPARSER_H_

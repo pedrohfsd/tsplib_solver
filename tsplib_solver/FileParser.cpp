@@ -1,14 +1,6 @@
-#include <fstream>
-#include <memory>
-#include <sstream>
-#include <unordered_map>
-#include <vector>
-#include <functional>
-
-#include "Data.h"
-#include "Edge.h"
 #include "FileParser.h"
-#include "Vertex.h"
+
+#include <sstream>
 
 using namespace std;
 
@@ -51,17 +43,17 @@ void FileParser::createTestData(Data& data) {
 	int* c[4] = { c0,c1,c2,c3 };
 	int n = 4;*/
 
-	int c0[6] = { 1, 153, 510, 706, 966, 581 };
+	/*int c0[6] = { 1, 153, 510, 706, 966, 581 };
 	int c1[6] = { 153, 1, 422, 664, 997, 598 };
 	int c2[6] = { 510, 422, 1, 289, 744, 390 };
 	int c3[6] = { 706, 664, 289, 1, 491, 265 };
 	int c4[6] = { 966, 997, 744, 491, 1, 400 };
 	int c5[6] = { 581, 598, 390, 265, 400, 1 };
 	int* c[6] = { c0,c1,c2,c3,c4,c5 };
-	int n = 6;
+	int n = 6;*/
 
 	//flow = 28
-	/*int c0[8] = { 0, 10, 5, 15, 0, 0, 0, 0 };
+	int c0[8] = { 0, 10, 5, 15, 0, 0, 0, 0 };
 	int c1[8] = { 0, 0, 4, 0, 9, 15, 0, 0 };
 	int c2[8] = { 0, 0, 0, 4, 0, 8, 0, 0 };
 	int c3[8] = { 0, 0, 0, 0, 0, 0, 30, 0 };
@@ -70,14 +62,14 @@ void FileParser::createTestData(Data& data) {
 	int c6[8] = { 0, 0, 6, 0, 0, 0, 0, 10 };
 	int c7[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 	int* c[8] = { c0,c1,c2,c3,c4,c5,c6,c7 };
-	int n = 8;*/
+	int n = 8;
 
 	data.init(n);
 	for (int i = 0; i < n; i++) {
-		Vertex& vertice = data.vertices[i];
+		Vertex& vertex = data.vertices[i];
 		for (int j = 0; j < n; j++) {
-			vertice.edges[j].cost = c[i][j];
-			vertice.edges[j].id = Data::indexToId(n, i, j);
+			vertex.edges[j].cost = c[i][j];
+			vertex.edges[j].id = Data::indexToId(n, i, j);
 		}
 	}
 
@@ -125,10 +117,10 @@ void FileParser::buildDataFromNodes(vector<vector<double>>& nodes, function<int(
 void FileParser::buildDataFromEdges(vector<vector<double>>& edges, Data& data) {
 	int n = (int)data.vertices.size();
 	for (int i = 0; i < n; i++) {
-		Vertex& vertice = data.vertices[i];
+		Vertex& vertex = data.vertices[i];
 		for (int j = 0; j < n; j++) {
-			vertice.edges[j].cost = (int)edges[i][j];
-			vertice.edges[j].id = Data::indexToId(n, i, j);
+			vertex.edges[j].cost = (int)edges[i][j];
+			vertex.edges[j].id = Data::indexToId(n, i, j);
 		}
 	}
 };
