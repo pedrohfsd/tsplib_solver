@@ -31,6 +31,10 @@ void CuttingPlane_LP_Callback::run(Data& data) {
 #endif
 		if (!cplex.solve())	return;
 		cout << "Obj = " << cplex.getObjValue() << endl;
+		/*if (cplex.getObjValue() == 385) {*/
+		if (fabs(cplex.getObjValue()-1951.5) <= EPS) {
+			cout << "found" << endl;
+		}
 		if (!addSubtourConnectionConstraint(cplex, vars, data)) break;
 	}
 
@@ -97,18 +101,25 @@ bool CuttingPlane_LP_Callback::addSubtourConnectionConstraint(IloCplex cplex, Il
 	for (int i = 0; i < vars.getSize(); i++) costMatrix[i].resize(n);
 	Data::toMatrix(edges, n, costMatrix);
 
+	bool contraintsAdd = false;
 	for (size_t j = 1; j < n; j++) {
-		vector<int> s;
-		vector<int> t;
-		double maxFlow = data.findMinCut(0, j, costMatrix, s);
-		if (maxFlow - 1 > -EPS) continue; // if maxFLow >= 1
-		addSubtourConstraints(cplex, vars, s, t, data);
-		return true;
+		vector<int> minCut;
+		double maxFlow = data.findMinCut(0, j, costMatrix, minCut);
+		if (maxFlow - 1 >= -EPS) continue; // if maxFLow >= 1
+		//cout << "Added Contraint from " << 0 << " to " << j << endl;
+		/*if (minCut.size() == 1) {
+			for (int i = 0; i < vars.getSize(); i++) {
+				cout << edges[i] << ",";
+			}
+			cout << "achou" << endl;
+		}*/
+		addSubtourConstraints(cplex, vars, minCut, data);
+		contraintsAdd = true;
 	}
-	return false;
+	return contraintsAdd;
 }
 
-void CuttingPlane_LP_Callback::addSubtourConstraints(IloCplex cplex, IloNumVarArray vars, const vector<int>& s, const vector<int>& t, Data& data) {
+void CuttingPlane_LP_Callback::addSubtourConstraints(IloCplex cplex, IloNumVarArray vars, const vector<int>& s, Data& data) {
 	IloModel model = cplex.getModel();
 	IloRangeArray cons(cplex.getEnv());
 	int n = data.vertices.size();
@@ -155,15 +166,14 @@ void MyCallback_LP::main()
 	Data::toMatrix(edges, n, costMatrix);
 
 	for (size_t j = 1; j < n; j++) {
-		vector<int> s;
-		vector<int> t;
-		double maxFlow = data.findMinCut(0, j, costMatrix, s);
-		if (maxFlow - 1 > -EPS) continue; // if maxFLow == 1
-		addSubtourConstraints(x, s, t, data);
+		vector<int> minCut;
+		double maxFlow = data.findMinCut(0, j, costMatrix, minCut);
+		if (maxFlow - 1 >= -EPS) continue; // if maxFLow >= 1
+		addSubtourConstraints(x, minCut, data);
 	}
 }
 
-void MyCallback_LP::addSubtourConstraints(IloNumVarArray x, const vector<int>& s, const vector<int>& t, Data& data) {
+void MyCallback_LP::addSubtourConstraints(IloNumVarArray x, const vector<int>& s, Data& data) {
 	IloRangeArray cons(getEnv());
 	int n = data.vertices.size();
 

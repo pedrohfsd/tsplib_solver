@@ -1,6 +1,8 @@
 #include "Data.h"
 
+#include <limits>
 #include <queue>
+#include <set>
 #include <stack>
 
 #define EPS 1e-5
@@ -23,22 +25,22 @@ void Data::init(int n) {
 	}
 };
 
-void Data::findConnectedComponent(const vector<vector<double>>& edgeValues, vector<int>& connectComponent) {
-	findConnectedComponent(0, edgeValues, connectComponent);
+void Data::findConnectedComponent(const vector<vector<double>>& edgeValues, vector<int>& connectedComponent) {
+	findConnectedComponent(0, edgeValues, connectedComponent);
 };
 
-void Data::findConnectedComponent(int root, const vector<vector<double>>& edgeValues, vector<int>& connectComponent) {
-	int n = (int)vertices.size();
-
+void Data::findConnectedComponent(int root, const vector<vector<double>>& edgeValues, vector<int>& connectedComponent) {
 	queue<int> q;
+	size_t n = vertices.size();
 	vector<bool> visited(n, false);
+
 	q.push(root);
 	visited[root] = true;
 	while (!q.empty()) {
 		int node = q.front();
 		q.pop();
-		connectComponent.push_back(node);
-		for (int i = 0; i < n; i++) {
+		connectedComponent.push_back(node);
+		for (size_t i = 0; i < n; i++) {
 			if (!visited[i] && fabs(edgeValues[node][i]) > EPS) {
 				q.push(i);
 				visited[i] = true;
@@ -47,21 +49,31 @@ void Data::findConnectedComponent(int root, const vector<vector<double>>& edgeVa
 	}
 };
 
+void Data::findCutSet(vector<int>& cut, vector<Edge>& cutset) {
+	set<int> s(cut.begin(), cut.end());
+	for(int& v : cut) {
+		for (int i = 0; i < vertices.size(); i++) {
+			Edge& e = vertices[v].edges[i];
+			if (s.find(i) == s.end() && e.cost != 0) cutset.push_back(e);
+		}
+	}
+}
+
 double Data::findMinCut(int source, int sink, const vector<vector<double>>& capacities, vector<int>& minCut) {
 	size_t n = vertices.size();
-	vector<vector<double>> flow;
-	vector<vector<double>> residual;
+	vector<vector<double>> flow(n);
+	vector<vector<double>> residual(n);
 	for (size_t i = 0; i < n; i++){
-		flow.push_back(vector<double>(n));
-		residual.push_back(vector<double>(n));
+		flow[i].resize(n, 0);
+		residual[i].resize(n, 0);
 	}
 	double max_flow = maxFlow(source, sink, capacities, flow, residual);
 
-	vector<vector<double>> remainingFlow;
+	vector<vector<double>> remainingFlow(n);
 	for (size_t i = 0; i < n; i++) {
-		remainingFlow.push_back(vector<double>(n));
+		remainingFlow[i].resize(n, 0);
 		for (size_t j = 0; j < n; j++) {
-			remainingFlow[i][j] = capacities[i][j] - flow[i][j];
+			remainingFlow[i][j] = (capacities[i][j] - flow[i][j]) + residual[i][j];
 		}
 	}
 	findConnectedComponent(source, remainingFlow, minCut);
@@ -81,11 +93,10 @@ double Data::maxFlow(int source, int sink, const vector<vector<double>>& edgeCap
 };
 
 void Data::findAugmentingPath(int source, int sink, vector<int>& augmentingPath, const vector<vector<double>>&capacities, const vector<vector<double>>& flow, const vector<vector<double>>& residual) {
-	int n = (int)vertices.size();
 	queue<int> q;
-	vector<bool> visited(n);
-	vector<int> prev(n);
-	for (int i = 0; i < n; i++) prev[i] = -1;
+	size_t n = vertices.size();
+	vector<bool> visited(n, false);
+	vector<int> prev(n, -1);
 
 	q.push(source);
 	prev[source] = source;
@@ -94,9 +105,9 @@ void Data::findAugmentingPath(int source, int sink, vector<int>& augmentingPath,
 		int node = q.front();
 		q.pop();
 		if (node == sink) break;
-		for (int i = 0; i < n; i++) {
+		for (size_t i = 0; i < n; i++) {
 			if (visited[i]) continue;
-			if ((fabs(flow[node][i] - capacities[node][i]) < EPS) && (fabs(residual[i][node]) < EPS)) continue;
+			if ((fabs(flow[node][i] - capacities[node][i]) <= EPS) && (fabs(residual[node][i]) <= EPS)) continue;
 			q.push(i);
 			prev[i] = node;
 			visited[i] = true;
@@ -114,28 +125,24 @@ void Data::findAugmentingPath(int source, int sink, vector<int>& augmentingPath,
 };
 
 double Data::augment(vector<int>& augmentingPath, const vector<vector<double>>&capacities, vector<vector<double>>& flow, vector<vector<double>>& residual) {
-	int n = (int)vertices.size();
+	size_t n = vertices.size();
 	if (augmentingPath.size() < 2) throw(exception("Can't augment path from node to itself"));
-	int from = augmentingPath[0];
-	int to = augmentingPath[1];
-	double min = (flow[from][to] - capacities[from][to] < -EPS ? capacities[from][to] - flow[from][to] : residual[to][from]);
-	for (int i = 2; i < augmentingPath.size(); i++) {
-		from = augmentingPath[i-1];
-		to = augmentingPath[i];
-		double f = (flow[from][to] - capacities[from][to] < -EPS ? capacities[from][to] - flow[from][to] : residual[to][from]);
+	double min = numeric_limits<double>::max();
+	for (size_t i = 1; i < augmentingPath.size(); i++) {
+		int from = augmentingPath[i-1];
+		int to = augmentingPath[i];
+		double f = flow[from][to] - capacities[from][to] < -EPS ? capacities[from][to] - flow[from][to] : residual[from][to];
 		if (f < min) min = f;
 	}
 
-	for (int i = 1; i < augmentingPath.size(); i++) {
+	for (size_t i = 1; i < augmentingPath.size(); i++) {
 		int from = augmentingPath[i-1];
 		int to = augmentingPath[i];
 		int edgeid = Data::indexToId(n, augmentingPath[i - 1], augmentingPath[i]);
 		if (flow[from][to] - capacities[from][to] < -EPS) {
 			flow[from][to] += min;
-			residual[from][to] += min;
-		} else {
-			residual[to][from] -= min;
-		}
+			residual[to][from] += min;
+		} else residual[from][to] -= min;
 	}
 	return min;
 };

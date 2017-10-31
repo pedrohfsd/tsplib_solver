@@ -14,6 +14,7 @@ public:
 	void findConnectedComponent(const std::vector<std::vector<double>>& edgeValues, std::vector<int>& connectComponent);
 	void findConnectedComponent(int root, const std::vector<std::vector<double>>& edgeValues, std::vector<int>& connectComponent);
 	double findMinCut(int source, int sink, const std::vector<std::vector<double>>& capacities, std::vector<int>& minCut);
+	void findCutSet(std::vector<int>& cut, std::vector<Edge>& cutset);
 	double maxFlow(int source, int sink, const std::vector<std::vector<double>>& edgeCapacities, std::vector<std::vector<double>>& flow, std::vector<std::vector<double>>& residual);
 
 	static int edgeIdToRow(int id, int rows);

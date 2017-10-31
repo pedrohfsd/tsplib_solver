@@ -18,7 +18,7 @@ private:
 	void addDegreeConstraints(IloModel, IloNumVarArray, Data&);
 	void addObjectiveFunction(IloModel, IloNumVarArray, Data&);
 	bool addSubtourConnectionConstraint(IloCplex cplex, IloNumVarArray var, Data& data);
-	void addSubtourConstraints(IloCplex cplex, IloNumVarArray vars, const std::vector<int>& s, const std::vector<int>& t, Data& data);
+	void addSubtourConstraints(IloCplex cplex, IloNumVarArray vars, const std::vector<int>& s, Data& data);
 	void print(IloCplex, IloNumVarArray);
 };
 
@@ -28,7 +28,7 @@ public:
 	MyCallback_LP(IloEnv env, IloNumVarArray x, Data& data);
 
 	void main();
-	void addSubtourConstraints(IloNumVarArray x, const std::vector<int>& s, const std::vector<int>& t, Data& data);
+	void addSubtourConstraints(IloNumVarArray x, const std::vector<int>& s, Data& data);
 	IloCplex::CallbackI* duplicateCallback() const;
 private:
 	Data& data;

@@ -93,31 +93,19 @@ bool CuttingPlane_LP::addSubtourConnectionConstraint(IloCplex cplex, IloNumVarAr
 	Data::toMatrix(edges, n, costMatrix);
 
 	for (size_t j = 1; j < n; j++) {
-		vector<int> s;
-		vector<int> t;
-		double maxFlow = data.findMinCut(0, j, costMatrix, s);
-		if (maxFlow - 1 > -EPS) continue; // if maxFLow == 1
-		addSubtourConstraints(cplex, vars, s, t, data);
+		vector<int> minCut;
+		double maxFlow = data.findMinCut(0, j, costMatrix, minCut);
+		if (maxFlow - 1 >= -EPS) continue; // if maxFLow >= 1
+		addSubtourConstraints(cplex, vars, minCut, data);
 		return true;
 	}
 	return false;
 };
 
-void CuttingPlane_LP::addSubtourConstraints(IloCplex cplex, IloNumVarArray vars, const vector<int>& s, const vector<int>& t, Data& data) {
+void CuttingPlane_LP::addSubtourConstraints(IloCplex cplex, IloNumVarArray vars, const vector<int>& s, Data& data) {
 	IloModel model = cplex.getModel();
 	IloRangeArray cons(cplex.getEnv());
 	int n = data.vertices.size();
-
-	/*IloExpr expr(cplex.getEnv());
-	for (int i = 0; i < s.size(); i++) {
-		for (int j = 0; j < t.size(); j++) {
-			expr += vars[data.vertices[s[i]].edges[t[j]].id];
-			expr += vars[data.vertices[t[j]].edges[s[i]].id];
-		}
-	}
-	cons.add(IloRange(expr >= 2));
-	expr.end();
-	model.add(cons);*/
 
 	IloExpr expr(cplex.getEnv());
 	for (int i = 0; i < s.size(); i++) {

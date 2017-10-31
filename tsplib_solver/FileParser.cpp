@@ -73,21 +73,21 @@ void FileParser::createTestData(Data& data) {
 		}
 	}
 
-	//vector<vector<double>> capacities;
-	//vector<vector<double>> flow;
-	//vector<vector<double>> residual;
-	//for (int i = 0; i < n; i++) {
-	//	flow.push_back(vector<double>(n));
-	//	residual.push_back(vector<double>(n));
-	//	capacities.push_back(vector<double>(n));
-	//}
-	//for (int i = 0; i < n; i++)
-	//	for (int j = 0; j < n; j++)
-	//		capacities[i][j] = data.vertices[i].edges[j].cost;
-	////double max = data.maxFlow(0, 7, capacities, flow, residual);
+	vector<vector<double>> capacities(n);
+	vector<vector<double>> flow(n);
+	vector<vector<double>> residual(n);
+	for (int i = 0; i < n; i++) {
+		flow[i].resize(n);
+		residual[i].resize(n);
+		capacities[i].resize(n);
+	}
+	for (int i = 0; i < n; i++)
+		for (int j = 0; j < n; j++)
+			capacities[i][j] = data.vertices[i].edges[j].cost;
+	//double max = data.maxFlow(0, 7, capacities, flow, residual);
 
-	//vector<int> minCut;
-	//data.findMinCut(0,7,capacities,minCut);
+	vector<int> minCut;
+	data.findMinCut(0,7,capacities,minCut);
 };
 
 int FileParser::attDistance(double node1[2], double node2[2]) {
