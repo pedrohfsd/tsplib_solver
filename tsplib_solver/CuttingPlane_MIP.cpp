@@ -13,7 +13,7 @@ void CuttingPlane_MIP::run(Data& data, bool option1) {
 	IloEnv   env;
 	IloModel model(env, PROBLEM.c_str());
 	IloNumVarArray vars(env);
-	int n = data.vertices.size();
+	int n = (int)data.vertices.size();
 
 	addDecisionVariables(model, vars, data);
 	addObjectiveFunction(model, vars, data);

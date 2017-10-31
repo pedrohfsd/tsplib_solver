@@ -31,7 +31,7 @@ void Data::findConnectedComponent(const vector<vector<double>>& edgeValues, vect
 
 void Data::findConnectedComponent(int root, const vector<vector<double>>& edgeValues, vector<int>& connectedComponent) {
 	queue<int> q;
-	size_t n = vertices.size();
+	int n = (int)vertices.size();
 	vector<bool> visited(n, false);
 
 	q.push(root);
@@ -40,7 +40,7 @@ void Data::findConnectedComponent(int root, const vector<vector<double>>& edgeVa
 		int node = q.front();
 		q.pop();
 		connectedComponent.push_back(node);
-		for (size_t i = 0; i < n; i++) {
+		for (int i = 0; i < n; i++) {
 			if (!visited[i] && fabs(edgeValues[node][i]) > EPS) {
 				q.push(i);
 				visited[i] = true;
@@ -94,7 +94,7 @@ double Data::maxFlow(int source, int sink, const vector<vector<double>>& edgeCap
 
 void Data::findAugmentingPath(int source, int sink, vector<int>& augmentingPath, const vector<vector<double>>&capacities, const vector<vector<double>>& flow, const vector<vector<double>>& residual) {
 	queue<int> q;
-	size_t n = vertices.size();
+	size_t n = (int)vertices.size();
 	vector<bool> visited(n, false);
 	vector<int> prev(n, -1);
 
@@ -105,7 +105,7 @@ void Data::findAugmentingPath(int source, int sink, vector<int>& augmentingPath,
 		int node = q.front();
 		q.pop();
 		if (node == sink) break;
-		for (size_t i = 0; i < n; i++) {
+		for (int i = 0; i < n; i++) {
 			if (visited[i]) continue;
 			if ((fabs(flow[node][i] - capacities[node][i]) <= EPS) && (fabs(residual[node][i]) <= EPS)) continue;
 			q.push(i);
@@ -125,7 +125,7 @@ void Data::findAugmentingPath(int source, int sink, vector<int>& augmentingPath,
 };
 
 double Data::augment(vector<int>& augmentingPath, const vector<vector<double>>&capacities, vector<vector<double>>& flow, vector<vector<double>>& residual) {
-	size_t n = vertices.size();
+	int n = (int)vertices.size();
 	if (augmentingPath.size() < 2) throw(exception("Can't augment path from node to itself"));
 	double min = numeric_limits<double>::max();
 	for (size_t i = 1; i < augmentingPath.size(); i++) {

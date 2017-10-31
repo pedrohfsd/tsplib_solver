@@ -13,7 +13,7 @@ void CuttingPlane_MIP_Callback::run(Data& data, bool option1) {
 	IloEnv   env;
 	IloModel model(env, PROBLEM.c_str());
 	IloNumVarArray vars(env);
-	int n = data.vertices.size();
+	int n = (int)data.vertices.size();
 
 	addDecisionVariables(model, vars, data);
 	addObjectiveFunction(model, vars, data);
@@ -36,7 +36,7 @@ void CuttingPlane_MIP_Callback::addDegreeConstraints(IloModel model, IloNumVarAr
 	IloEnv env = model.getEnv();
 	IloRangeArray cons(env);
 
-	int n = data.vertices.size();
+	int n = (int)data.vertices.size();
 	for (int i = 0; i < n; i++) {
 		IloExpr expr(env);
 		for (int j = 0; j < n; j++)

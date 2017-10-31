@@ -18,18 +18,23 @@ private:
 	void addDegreeConstraints(IloModel, IloNumVarArray, Data&);
 	void addObjectiveFunction(IloModel, IloNumVarArray, Data&);
 	bool addSubtourConnectionConstraint(IloCplex cplex, IloNumVarArray var, Data& data);
-	void addSubtourConstraints(IloCplex cplex, IloNumVarArray vars, const std::vector<int>& s, Data& data);
 	void print(IloCplex, IloNumVarArray);
 };
 
-class MyCallback_LP : public IloCplex::LazyConstraintCallbackI
+template<typename T>
+class MyCallback_LP : public T
 {
 public:
-	MyCallback_LP(IloEnv env, IloNumVarArray x, Data& data);
+	MyCallback_LP(IloEnv env, IloNumVarArray x, Data& data) : T(env), x(x), data(data) {}
 
-	void main();
-	void addSubtourConstraints(IloNumVarArray x, const std::vector<int>& s, Data& data);
-	IloCplex::CallbackI* duplicateCallback() const;
+	void main()
+	{
+		IloRangeArray ranges = separateConstraints(*this, x, data);
+		for (int i = 0; i < ranges.getSize(); i++)
+			add(ranges[i]);
+	}
+	IloCplex::CallbackI* duplicateCallback() const { return (new (getEnv()) MyCallback_LP(*this)); }
+
 private:
 	Data& data;
 	IloNumVarArray x;
