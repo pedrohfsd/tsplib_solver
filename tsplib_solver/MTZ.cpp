@@ -1,7 +1,16 @@
 /*
-Solution for the TSP using the MTZ (Miller-Tucker-Zemlin, n^2 squared constraints):
-2<=ui<=n, i!=1
-ui-uj+1 <= (n-1)(1-xij) , i!=1, j!=1
+Solution for the TSP using the MTZ (Miller-Tucker-Zemlin, n^2 squared constraints) formulation:
+
+//TSP Formulation:
+Min sum(Cij*Xij) | i{1,...,n} and j={1,...,n} --> choose edges atempting to minimize total cost
+sum(Xij) = 1 | j={1,...,n}					  --> every node uses exactly 1 outgoing edge
+sum(Xij) = 1 | 1={1,...,n}					  --> every node uses exactly 1 incoming edge
+Xii = 0 | i={1,...,n}						  --> use an edge to itself is not allowed
+Xij = {0,1} | i{1,...,n} and j={1,...,n}	  --> we want an integer result (every edge is used or not) 
+// Additional MTZ constraints
+2<=ui<=n | i!=1								  --> every node is associated to a number ranging from 2 to n
+ui-uj+1 <= (n-1)(1-xij) | i!=1, j!=1		  --> this association must be sequential, ordered
+u0 = 1 --> 
 
 This formulation removes subtours by numbering each node and imposing a sequential order with the given restrictions:
 - there's a node u where number[u] = 1
@@ -16,107 +25,49 @@ If we can number all the nodes from 1 to n in the above way, then this must be a
 
 using namespace std;
 
-MTZ::MTZ() {
-};
+MTZ::MTZ(Data& data, bool singleThreaded):TSP(data, "MTZ", singleThreaded)
+, u(IloNumVarArray(env, (int)data.vertices.size())) {}
 
-void MTZ::run(Data& data) {
-	IloEnv   env;
-	IloModel model(env, PROBLEM.c_str());
-	IloNumVarArray vars(env);
-	IloRangeArray cons(env);
+void MTZ::solve() {
 
-	addDecisionVariables(model, vars, cons, data);
-	addObjectiveFunction(model, vars, cons, data);
-	addDegreeConstraints(model, vars, cons, data);
-	addSubtourEliminationConstraint(model, vars, cons, data);
+	addDecisionVariables(true);
+	addObjectiveFunction();
+	addIncomingEdgeConstraints();
+	addOutgoingEdgeConstraints();
+	addSelfEdgeConstraints();
+	
+	addSubtourEliminationVariables();
+	addSubtourEliminationConstraints();
 
 	model.add(cons);
 	IloCplex cplex(model);
-	cplex.exportModel((PROBLEM + ".lp").c_str());
-	cplex.setParam(IloCplex::Threads, 1);
+	cplex.exportModel((formulationName + ".lp").c_str());
+	if (singleThreaded) cplex.setParam(IloCplex::Threads, 1);
 
 	if (!cplex.solve()) {
 		env.error() << "Failed to optimize LP" << endl;
 		throw(-1);
 	}
 
-	print(cplex, vars, cons);
-};
+	print(cplex);
+}
 
-void MTZ::addDecisionVariables(IloModel model, IloNumVarArray var, IloRangeArray con, Data& data) {
-	IloEnv env = model.getEnv();
-	size_t n = data.vertices.size();
-	for (int i = 0; i < n; i++) {
-		for (int j = 0; j < n; j++) {
-			stringstream name; name << "x_" << i << "_" << j;
-			var.add(IloBoolVar(env, name.str().c_str()));
-		}
-	}
-};
-
-void MTZ::addDegreeConstraints(IloModel model, IloNumVarArray var, IloRangeArray con, Data& data) {
-	IloEnv env = model.getEnv();
-	size_t n = data.vertices.size();
-	for (int i = 0; i < n; i++) {
-		IloExpr expr(env);
-		for (int j = 0; j < n; j++) 
-			expr += var[data.vertices[i].edges[j].id];
-		con.add(IloRange(expr == 1));
-		expr.end();
-
-		expr = IloExpr(env);
-		for (int j = 0; j < n; j++)
-			expr += var[data.vertices[j].edges[i].id];
-		con.add(IloRange(expr == 1));
-		expr.end();
-	}
-};
-
-void MTZ::addObjectiveFunction(IloModel model, IloNumVarArray var, IloRangeArray con, Data& data) {
-	IloEnv env = model.getEnv();
-	IloExpr expr(env);
-	size_t n = data.vertices.size();
-	for (int i = 0; i < n; i++) {
-		for (int j = 0; j < n; j++) {
-			Edge edge = data.vertices[i].edges[j];
-			expr += edge.cost * var[edge.id];
-		}
-	}
-	model.add(IloMinimize(env, expr));
-	expr.end();
-};
-
-void MTZ::addSubtourEliminationConstraint(IloModel model, IloNumVarArray var, IloRangeArray con, Data& data)	{
-	IloEnv env = model.getEnv();
+void MTZ::addSubtourEliminationConstraints()	{
 	int n = (int)data.vertices.size();
-	IloNumVarArray u(env, n);
-	for (int v = 1; v < n; v++) {
-		stringstream name;
-		name << "u_" << v;
-		var.add(u[v] = IloIntVar(env, 2, n, name.str().c_str()));
-	}
 	for (int i = 1; i < n; i++) {
 		for (int j = 1; j < n; j++) {
 			IloExpr expr(env);
 			expr += u[i]- u[j] + 1;
-			expr -= (n - 1) * (1 - var[data.vertices[i].edges[j].id]);
-			con.add(IloRange(expr <= 0));
+			expr -= (n - 1) * (1 - vars[data.vertices[i].edges[j].id]);
+			cons.add(IloRange(expr <= 0));
 			expr.end();
 		}
 	}
-};
+}
 
-void MTZ::print(IloCplex cplex, IloNumVarArray var, IloRangeArray con) {
-	IloEnv env = cplex.getEnv();
-	IloNumArray vals(env);
-	env.out() << "Solution status = " << cplex.getStatus() << endl;
-	env.out() << "Solution value  = " << cplex.getObjValue() << endl;
-	cplex.getValues(vals, var);
-	env.out() << "Values        = " << vals << endl;
-	cplex.getSlacks(vals, con);
-	env.out() << "Slacks        = " << vals << endl;
-	/*cplex.getDuals(vals, con);
-	env.out() << "Duals         = " << vals << endl;
-	cplex.getReducedCosts(vals, var);
-	env.out() << "Reduced Costs = " << vals << endl;*/
-};
+void MTZ::addSubtourEliminationVariables() {
+	int n = (int)data.vertices.size();
+	for (int v = 1; v < n; v++) {
+		vars.add(u[v] = IloIntVar(env, 2, n, ("u_"+to_string(v)).c_str()));
+	}
+}

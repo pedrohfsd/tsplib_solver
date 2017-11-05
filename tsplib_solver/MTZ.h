@@ -3,21 +3,18 @@
 
 #include <ilcplex/ilocplex.h>
 #include "Data.h"
+#include "TSP.h"
 
-class MTZ {
+class MTZ: public TSP{
 
 public:
-	const std::string PROBLEM = "MTZ";
-	MTZ();
-	void run(Data&);
+	MTZ(Data& data, bool singleThreaded);
+	virtual void solve();
 
 private:
-	void addDecisionVariables(IloModel, IloNumVarArray, IloRangeArray, Data&);
-	void addDegreeConstraints(IloModel, IloNumVarArray, IloRangeArray, Data&);
-	void addObjectiveFunction(IloModel, IloNumVarArray, IloRangeArray, Data&);
-	void addSubtourEliminationConstraint(IloModel, IloNumVarArray, IloRangeArray, Data&);
-	void print(IloCplex, IloNumVarArray, IloRangeArray);
-
+	IloNumVarArray u;
+	void addSubtourEliminationConstraints();
+	void addSubtourEliminationVariables();
 };
 
 #endif // MTZ_H_

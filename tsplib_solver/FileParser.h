@@ -11,14 +11,16 @@
 
 class FileParser {
 public:
-	FileParser();
-	void createTestData(Data& data);
-	void read(const std::string& filepath, Data& data);
+	FileParser(Data& data);
+	void createTestData();
+	void parse(const std::string& filepath);
 
 private:
+	Data& data;
+
 	int attDistance(double node1[2], double node2[2]);
-	void buildDataFromNodes(std::vector<std::vector<double>>& nodes, std::function<int(double[], double[])> dist, Data& data);
-	void buildDataFromEdges(std::vector<std::vector<double>>& edges, Data& data);
+	void buildDataFromNodes(std::vector<std::vector<double>>& nodes, std::function<int(double[], double[])> dist);
+	void buildDataFromEdges(std::vector<std::vector<double>>& edges);
 	int euclidianDistance2D(double node1[2], double node2[2]);
 	int geoDistance(double node1[2], double node2[2]);
 	int nint(double x);

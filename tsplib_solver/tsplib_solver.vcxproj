@@ -14,19 +14,19 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{0F2F19B8-E625-4AFC-8FA6-7884FE84A1E2}</ProjectGuid>
     <RootNamespace>tsplib_solver</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -44,7 +44,10 @@
     <Import Project="..\props\CplexRelease.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -55,6 +58,7 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
+      <EnablePREfast>false</EnablePREfast>
     </ClCompile>
     <Link>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
@@ -83,26 +87,28 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="CuttingPlane_LP.h" />
-    <ClInclude Include="CuttingPlane_LP_Callback.h" />
-    <ClInclude Include="CuttingPlane_MIP.h" />
-    <ClInclude Include="CuttingPlane_MIP_Callback.h" />
+    <ClInclude Include="CuttingPlaneCrossing.h" />
+    <ClInclude Include="CuttingPlaneFlow.h" />
+    <ClInclude Include="CuttingPlaneSubtour.h" />
     <ClInclude Include="Data.h" />
     <ClInclude Include="Edge.h" />
     <ClInclude Include="FileParser.h" />
+    <ClInclude Include="SubtourElimination.h" />
     <ClInclude Include="MTZ.h" />
+    <ClInclude Include="TSP.h" />
     <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CuttingPlane_LP.cpp" />
-    <ClCompile Include="CuttingPlane_LP_Callback.cpp" />
-    <ClCompile Include="CuttingPlane_MIP.cpp" />
-    <ClCompile Include="CuttingPlane_MIP_Callback.cpp" />
+    <ClCompile Include="CuttingPlaneCrossing.cpp" />
+    <ClCompile Include="CuttingPlaneFlow.cpp" />
+    <ClCompile Include="CuttingPlaneSoubtour.cpp" />
     <ClCompile Include="Data.cpp" />
     <ClCompile Include="Edge.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="FileParser.cpp" />
     <ClCompile Include="MTZ.cpp" />
+    <ClCompile Include="SubtourElimination.cpp" />
+    <ClCompile Include="TSP.cpp" />
     <ClCompile Include="Vertex.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

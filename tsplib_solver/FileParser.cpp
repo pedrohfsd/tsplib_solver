@@ -4,11 +4,11 @@
 
 using namespace std;
 
-FileParser::FileParser() {
-};
+FileParser::FileParser(Data& data):data(data) {}
 
-void FileParser::read(const string& filepath, Data& data) {
+void FileParser::parse(const string& filepath) {
 	ifstream infile(filepath);
+	if (!infile.is_open()) throw exception(("Filepath " + filepath + " does not exists").c_str());
 	unordered_map<string, string> spec;
 	readSpecification(infile, spec);
 	int n = stoi(spec["DIMENSION"]);
@@ -25,17 +25,17 @@ void FileParser::read(const string& filepath, Data& data) {
 		vector<vector<double>> nodes;
 		for (int i = 0; i < data.vertices.size(); i++) nodes.push_back(vector<double>(n));
 		readNodes2D(infile, nodes);
-		buildDataFromNodes(nodes, dist, data);
+		buildDataFromNodes(nodes, dist);
 	}
 	else if (spec["EDGE_WEIGHT_FORMAT"] == "LOWER_DIAG_ROW") {
 		vector<vector<double>> edges;
 		for (int i = 0; i < data.vertices.size(); i++) edges.push_back(vector<double>(n));
 		readLowDiagEdges2D(infile, edges);
-		buildDataFromEdges(edges, data);
+		buildDataFromEdges(edges);
 	}
 };
 
-void FileParser::createTestData(Data& data) {
+void FileParser::createTestData() {
 	/*int c0[4] = { 5,8,2,1 };
 	int c1[4] = { 5,1,5,3 };
 	int c2[4] = { 6,3,4,2 };
@@ -101,7 +101,7 @@ int FileParser::attDistance(double node1[2], double node2[2]) {
 	return tij;
 };
 
-void FileParser::buildDataFromNodes(vector<vector<double>>& nodes, function<int(double[], double[])> dist, Data& data) {
+void FileParser::buildDataFromNodes(vector<vector<double>>& nodes, function<int(double[], double[])> dist) {
 	int n = (int)data.vertices.size();
 	for (int i = 0; i < n; i++) {
 		Vertex& vertex = data.vertices[i];
@@ -114,7 +114,7 @@ void FileParser::buildDataFromNodes(vector<vector<double>>& nodes, function<int(
 	}
 };
 
-void FileParser::buildDataFromEdges(vector<vector<double>>& edges, Data& data) {
+void FileParser::buildDataFromEdges(vector<vector<double>>& edges) {
 	int n = (int)data.vertices.size();
 	for (int i = 0; i < n; i++) {
 		Vertex& vertex = data.vertices[i];

@@ -31,6 +31,12 @@
     <Filter Include="Header Files\parser">
       <UniqueIdentifier>{d5ab66ca-6c85-4d79-879d-3668df7ee282}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\formulation\constraint">
+      <UniqueIdentifier>{c81043b9-5f46-4adb-8db3-292ae319e74d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\formulation\constraint">
+      <UniqueIdentifier>{8399c177-1fdd-4498-b551-51970d121720}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vertex.h">
@@ -48,17 +54,20 @@
     <ClInclude Include="FileParser.h">
       <Filter>Header Files\parser</Filter>
     </ClInclude>
-    <ClInclude Include="CuttingPlane_MIP.h">
+    <ClInclude Include="TSP.h">
       <Filter>Header Files\formulation</Filter>
     </ClInclude>
-    <ClInclude Include="CuttingPlane_LP.h">
+    <ClInclude Include="CuttingPlaneCrossing.h">
       <Filter>Header Files\formulation</Filter>
     </ClInclude>
-    <ClInclude Include="CuttingPlane_MIP_Callback.h">
+    <ClInclude Include="CuttingPlaneSubtour.h">
       <Filter>Header Files\formulation</Filter>
     </ClInclude>
-    <ClInclude Include="CuttingPlane_LP_Callback.h">
+    <ClInclude Include="CuttingPlaneFlow.h">
       <Filter>Header Files\formulation</Filter>
+    </ClInclude>
+    <ClInclude Include="SubtourElimination.h">
+      <Filter>Header Files\formulation\constraint</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -80,17 +89,20 @@
     <ClCompile Include="FileParser.cpp">
       <Filter>Source Files\parser</Filter>
     </ClCompile>
-    <ClCompile Include="CuttingPlane_MIP.cpp">
+    <ClCompile Include="TSP.cpp">
       <Filter>Source Files\formulation</Filter>
     </ClCompile>
-    <ClCompile Include="CuttingPlane_LP.cpp">
+    <ClCompile Include="CuttingPlaneCrossing.cpp">
       <Filter>Source Files\formulation</Filter>
     </ClCompile>
-    <ClCompile Include="CuttingPlane_MIP_Callback.cpp">
+    <ClCompile Include="CuttingPlaneSoubtour.cpp">
       <Filter>Source Files\formulation</Filter>
     </ClCompile>
-    <ClCompile Include="CuttingPlane_LP_Callback.cpp">
+    <ClCompile Include="CuttingPlaneFlow.cpp">
       <Filter>Source Files\formulation</Filter>
+    </ClCompile>
+    <ClCompile Include="SubtourElimination.cpp">
+      <Filter>Source Files\formulation\constraint</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

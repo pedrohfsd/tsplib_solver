@@ -1,51 +1,53 @@
-#include <iostream>
-
-#include "CuttingPlane_MIP.h"
-#include "CuttingPlane_MIP_Callback.h"
-#include "CuttingPlane_LP.h"
-#include "CuttingPlane_LP_Callback.h"
+#include "CuttingPlaneCrossing.h"
+#include "CuttingPlaneSubtour.h"
+#include "CuttingPlaneFlow.h"
 #include "Data.h"
 #include "FileParser.h"
 #include "MTZ.h"
 
+#include <iostream>
 using namespace std;
 
 int main(int argc, const char* argv[]) {
-	//try {
-		if (argc != 3) {
+#ifndef _DEBUG	
+	try { 
+#endif
+		if (argc != 4) {
 			cout << "There are one or more parameters missing" << endl;
-			cout << "Correct usage is: program [formulation] [filePath]" << endl;
-			cout << "where [formulation] is one of: {'MTZ', 'CuttingPlane_MIP_1', 'CuttingPlane_MIP_2', 'CuttingPlane_LP'}" << endl;
+			cout << "Correct usage is: program [formulation] [singleThreaded] [filePath]" << endl;
+			cout << "where [formulation] is one of: {'MTZ', 'CuttingPlaneCrossing', 'CuttingPlaneSubtour', 'CuttingPlaneFlow'}" << endl;
+			cout << "[singleThreaded] is one of: {'true' or 'false'}" << endl;
 			cout << "and [filePath] is a path to a tsplib file" << endl;
 			return 0;
 		}
 		const char* param1 = argv[1];
-		const char* param2 = argv[2];
-		cout << "Loading file " << param2 << "..." << endl;
+		const bool param2 = !strcmp(argv[2], "true") ? true : false;
+		const char* param3 = argv[3];
+		cout << "Loading file " << param3 << "..." << endl;
 
 		Data data;
-		FileParser parser;
-		//parser.createTestData(data);
-		parser.read(param2, data);
+		FileParser fileParser(data);
+		fileParser.parse(param3);
 
-		if(!strcmp(param1, "MTZ")) MTZ().run(data);
-		else if (!strcmp(param1, "CuttingPlane_MIP_1")) CuttingPlane_MIP().run(data, true);
-		else if (!strcmp(param1, "CuttingPlane_MIP_2")) CuttingPlane_MIP().run(data, false);
-		else if (!strcmp(param1, "CuttingPlane_MIP_Callback")) CuttingPlane_MIP_Callback().run(data, true);
-		else if (!strcmp(param1, "CuttingPlane_LP")) CuttingPlane_LP().run(data);
-		else if (!strcmp(param1, "CuttingPlane_LP_Callback")) CuttingPlane_LP_Callback().run(data);
-	//}
-	//catch (IloException& e) {
-	//	cerr << "Concert exception caught: " << e << endl;
-	//}
-	//catch (const string& e) {
-	//	cerr << "Exception caught: " << e << endl;
-	//}
-	//catch (exception& e) {
-	//	cerr << "Exception caught: " << e.what() << endl;
-	//}
-	//catch (...) {
-	//	cerr << "Unknown exception caught." << endl;
-	//}
+		if(!strcmp(param1, "MTZ")) MTZ(data, param2).solve();
+		else if (!strcmp(param1, "CuttingPlaneCrossing")) CuttingPlaneCrossing(data, param2).solve();
+		else if (!strcmp(param1, "CuttingPlaneSubtour")) CuttingPlaneSubtour(data, param2).solve();
+		else if (!strcmp(param1, "CuttingPlaneFlow")) CuttingPlaneFlow(data, param2).solve();
+		else cout << "Invalid formulation parameter!" << endl;
+#ifndef _DEBUG 
+	}
+	catch (IloException& e) {
+		cerr << "Concert exception caught: " << e << endl;
+	}
+	catch (const string& e) {
+		cerr << "Exception caught: " << e << endl;
+	}
+	catch (exception& e) {
+		cerr << "Exception caught: " << e.what() << endl;
+	}
+	catch (...) {
+		cerr << "Unknown exception caught." << endl;
+	}
+#endif
 	return 0;
 }
